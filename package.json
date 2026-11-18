@@ -1,0 +1,30 @@
+{
+  "name": "gerenciador-tarefas-mvc",
+  "version": "1.0.0",
+  "description": "Gerenciador de tarefas com arquitetura MVC - Node.js, TypeScript, Express e PostgreSQL",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc && node -e \"require('fs').cpSync('src/views/public','dist/views/public',{recursive:true})\"",
+    "start": "node dist/server.js",
+    "db:init": "tsx src/config/init-db.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["mvc", "express", "typescript", "postgresql"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

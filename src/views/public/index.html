@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerenciador de Tarefas</title>
+  <meta name="description" content="Gerenciador de tarefas - projeto acadêmico de arquitetura MVC" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234f46e5'/%3E%3Cpath d='M7 12.5l3 3 7-7' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <!-- Ícones (SVG sprite): usados com <svg><use href="#i-..."/></svg> -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 9l4 3-4 3z" fill="currentColor"/></symbol>
+    <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17v3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.8 12.2h9.4L17.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5.5 21V4.5M5.5 5h11l-2 4 2 4h-11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5.5h16l-6 7.2V19l-4-2v-4.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v5.5M12 16.2v.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <div class="brand">
+        <span class="brand__logo"><svg><use href="#i-check" /></svg></span>
+        <div>
+          <h1 class="brand__title">Gerenciador de Tarefas</h1>
+          <p class="brand__subtitle" id="today-label">Organize suas atividades</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Resumo -->
+    <section class="stats" aria-label="Resumo das tarefas">
+      <article class="stat">
+        <span class="stat__icon stat__icon--total"><svg><use href="#i-list" /></svg></span>
+        <div><p class="stat__label">Total</p><p class="stat__value" id="stat-total">0</p></div>
+      </article>
+      <article class="stat">
+        <span class="stat__icon stat__icon--pending"><svg><use href="#i-clock" /></svg></span>
+        <div><p class="stat__label">Pendentes</p><p class="stat__value" id="stat-pending">0</p></div>
+      </article>
+      <article class="stat">
+        <span class="stat__icon stat__icon--progress"><svg><use href="#i-play" /></svg></span>
+        <div><p class="stat__label">Em andamento</p><p class="stat__value" id="stat-in_progress">0</p></div>
+      </article>
+      <article class="stat">
+        <span class="stat__icon stat__icon--done"><svg><use href="#i-done" /></svg></span>
+        <div><p class="stat__label">Concluídas</p><p class="stat__value" id="stat-completed">0</p></div>
+      </article>
+    </section>
+
+    <div class="layout">
+      <!-- Cadastro -->
+      <aside class="panel panel--form">
+        <h2 class="panel__title"><svg><use href="#i-plus" /></svg> Nova tarefa</h2>
+        <form id="create-form" class="form" novalidate>
+          <div class="field">
+            <label for="create-title">Título <span class="req">*</span></label>
+            <input id="create-title" name="title" type="text" maxlength="120" placeholder="Ex.: Preparar apresentação MVC" required />
+            <p class="field__error" data-error-for="title"></p>
+          </div>
+          <div class="field">
+            <label for="create-description">Descrição <span class="req">*</span></label>
+            <textarea id="create-description" name="description" rows="3" maxlength="2000" placeholder="Detalhes da tarefa" required></textarea>
+            <p class="field__error" data-error-for="description"></p>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="create-priority">Prioridade <span class="req">*</span></label>
+              <select id="create-priority" name="priority" required>
+                <option value="low">Baixa</option>
+                <option value="medium" selected>Média</option>
+                <option value="high">Alta</option>
+              </select>
+              <p class="field__error" data-error-for="priority"></p>
+            </div>
+            <div class="field">
+              <label for="create-dueDate">Prazo <span class="req">*</span></label>
+              <input id="create-dueDate" name="dueDate" type="date" required />
+              <p class="field__error" data-error-for="dueDate"></p>
+            </div>
+          </div>
+          <p class="form__hint">A tarefa será criada com status <strong>Pendente</strong>.</p>
+          <button type="submit" class="btn btn--primary btn--block">
+            <svg><use href="#i-plus" /></svg> Cadastrar tarefa
+          </button>
+        </form>
+      </aside>
+
+      <!-- Listagem -->
+      <section class="panel panel--list">
+        <div class="list-header">
+          <h2 class="panel__title">Tarefas <span class="count" id="list-count">0</span></h2>
+          <form id="filters" class="filters" aria-label="Filtros">
+            <span class="filters__icon" aria-hidden="true"><svg><use href="#i-filter" /></svg></span>
+            <label class="sr-only" for="filter-status">Status</label>
+            <select id="filter-status" name="status">
+              <option value="">Todos os status</option>
+              <option value="pending">Pendente</option>
+              <option value="in_progress">Em andamento</option>
+              <option value="completed">Concluída</option>
+            </select>
+            <label class="sr-only" for="filter-priority">Prioridade</label>
+            <select id="filter-priority" name="priority">
+              <option value="">Todas as prioridades</option>
+              <option value="high">Alta</option>
+              <option value="medium">Média</option>
+              <option value="low">Baixa</option>
+            </select>
+            <label class="sr-only" for="filter-due">Prazo</label>
+            <select id="filter-due" name="due">
+              <option value="">Qualquer prazo</option>
+              <option value="overdue">Atrasadas</option>
+              <option value="today">Vencem hoje</option>
+              <option value="next7">Próximos 7 dias</option>
+            </select>
+            <button type="reset" class="btn btn--ghost btn--sm" id="clear-filters" hidden>Limpar</button>
+          </form>
+        </div>
+
+        <div id="task-list" class="task-grid" aria-live="polite"></div>
+        <div id="empty-state" class="empty" hidden>
+          <span class="empty__icon"><svg><use href="#i-list" /></svg></span>
+          <p class="empty__title" id="empty-title">Nenhuma tarefa cadastrada</p>
+          <p class="empty__text" id="empty-text">Use o formulário para criar sua primeira tarefa.</p>
+        </div>
+        <div id="loading" class="loading" hidden>Carregando tarefas…</div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal: detalhes -->
+  <dialog id="details-dialog" class="dialog" aria-labelledby="details-title">
+    <div class="dialog__header">
+      <h3 id="details-title">Detalhes da tarefa</h3>
+      <button type="button" class="icon-btn" data-close aria-label="Fechar"><svg><use href="#i-x" /></svg></button>
+    </div>
+    <div class="dialog__body" id="details-body"></div>
+  </dialog>
+
+  <!-- Modal: edição -->
+  <dialog id="edit-dialog" class="dialog" aria-labelledby="edit-title">
+    <div class="dialog__header">
+      <h3 id="edit-title">Editar tarefa</h3>
+      <button type="button" class="icon-btn" data-close aria-label="Fechar"><svg><use href="#i-x" /></svg></button>
+    </div>
+    <form id="edit-form" class="form dialog__body" novalidate>
+      <input type="hidden" name="id" />
+      <div class="field">
+        <label for="edit-title-input">Título <span class="req">*</span></label>
+        <input id="edit-title-input" name="title" type="text" maxlength="120" required />
+        <p class="field__error" data-error-for="title"></p>
+      </div>
+      <div class="field">
+        <label for="edit-description">Descrição <span class="req">*</span></label>
+        <textarea id="edit-description" name="description" rows="4" maxlength="2000" required></textarea>
+        <p class="field__error" data-error-for="description"></p>
+      </div>
+      <div class="field-row field-row--3">
+        <div class="field">
+          <label for="edit-priority">Prioridade</label>
+          <select id="edit-priority" name="priority">
+            <option value="low">Baixa</option>
+            <option value="medium">Média</option>
+            <option value="high">Alta</option>
+          </select>
+          <p class="field__error" data-error-for="priority"></p>
+        </div>
+        <div class="field">
+          <label for="edit-status">Status</label>
+          <select id="edit-status" name="status">
+            <option value="pending">Pendente</option>
+            <option value="in_progress">Em andamento</option>
+            <option value="completed">Concluída</option>
+          </select>
+          <p class="field__error" data-error-for="status"></p>
+        </div>
+        <div class="field">
+          <label for="edit-dueDate">Prazo</label>
+          <input id="edit-dueDate" name="dueDate" type="date" required />
+          <p class="field__error" data-error-for="dueDate"></p>
+        </div>
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--ghost" data-close>Cancelar</button>
+        <button type="submit" class="btn btn--primary">Salvar alterações</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal: confirmação de exclusão -->
+  <dialog id="delete-dialog" class="dialog dialog--sm" aria-labelledby="delete-title">
+    <div class="dialog__body dialog__body--center">
+      <span class="danger-icon"><svg><use href="#i-trash" /></svg></span>
+      <h3 id="delete-title">Excluir tarefa?</h3>
+      <p class="muted">A tarefa <strong id="delete-task-name"></strong> será removida permanentemente.</p>
+      <div class="dialog__actions dialog__actions--center">
+        <button type="button" class="btn btn--ghost" data-close>Cancelar</button>
+        <button type="button" class="btn btn--danger" id="confirm-delete">Excluir</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Mensagens -->
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
